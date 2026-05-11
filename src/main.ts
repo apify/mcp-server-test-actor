@@ -140,8 +140,8 @@ app.post('/mcp', async (req: Request, res: Response) => {
     }
 });
 
-app.get('/mcp', (_req: Request, res: Response) => {
-    log.info('Received GET MCP request');
+const methodNotAllowed = (method: string) => (_req: Request, res: Response) => {
+    log.info(`Received ${method} MCP request`);
     res.writeHead(405).end(
         JSON.stringify({
             jsonrpc: '2.0',
@@ -152,21 +152,10 @@ app.get('/mcp', (_req: Request, res: Response) => {
             id: null,
         }),
     );
-});
+};
 
-app.delete('/mcp', (_req: Request, res: Response) => {
-    log.info('Received DELETE MCP request');
-    res.writeHead(405).end(
-        JSON.stringify({
-            jsonrpc: '2.0',
-            error: {
-                code: -32000,
-                message: 'Method not allowed.',
-            },
-            id: null,
-        }),
-    );
-});
+app.get('/mcp', methodNotAllowed('GET'));
+app.delete('/mcp', methodNotAllowed('DELETE'));
 
 // Start the server
 const PORT = process.env.APIFY_CONTAINER_PORT ? parseInt(process.env.APIFY_CONTAINER_PORT) : 3000;
