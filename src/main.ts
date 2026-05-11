@@ -1,3 +1,4 @@
+import { setTimeout } from 'node:timers/promises';
 import express, { Request, Response } from 'express';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
@@ -9,6 +10,12 @@ import { log, Actor } from 'apify';
 // Initialize the Apify Actor environment
 // This call configures the Actor for its environment and should be called at startup
 await Actor.init();
+
+Actor.on('aborting', async () => {
+    log.info('Actor is aborting, exiting...');
+    await setTimeout(1000);
+    await Actor.exit();
+});
 
 const getServer = () => {
     // Create an MCP server with implementation details
@@ -89,88 +96,112 @@ const getServer = () => {
     return server;
 };
 
-const app = express();
-app.use(express.json());
+const runStandby = async (): Promise<void> => {
+    const app = express();
+    app.use(express.json());
 
-// Configure CORS to expose Mcp-Session-Id header for browser-based clients
-app.use(
-    cors({
-        origin: '*', // Allow all origins - adjust as needed for production
-        exposedHeaders: ['Mcp-Session-Id'],
-    }),
-);
-
-// Readiness probe handler
-app.get('/', (req: Request, res: Response) => {
-    if (req.headers['x-apify-container-server-readiness-probe']) {
-        log.info('Readiness probe');
-        res.end('ok\n');
-        return;
-    }
-    res.status(404).end();
-});
-
-app.post('/mcp', async (req: Request, res: Response) => {
-    const server = getServer();
-    try {
-        const transport: StreamableHTTPServerTransport = new StreamableHTTPServerTransport({
-            sessionIdGenerator: undefined,
-        });
-        await server.connect(transport);
-        await transport.handleRequest(req, res, req.body);
-        res.on('close', () => {
-            log.info('Request closed');
-            transport.close();
-            server.close();
-        });
-    } catch (error) {
-        log.error('Error handling MCP request:', {
-            error,
-        });
-        if (!res.headersSent) {
-            res.status(500).json({
-                jsonrpc: '2.0',
-                error: {
-                    code: -32603,
-                    message: 'Internal server error',
-                },
-                id: null,
-            });
-        }
-    }
-});
-
-const methodNotAllowed = (method: string) => (_req: Request, res: Response) => {
-    log.info(`Received ${method} MCP request`);
-    res.writeHead(405).end(
-        JSON.stringify({
-            jsonrpc: '2.0',
-            error: {
-                code: -32000,
-                message: 'Method not allowed.',
-            },
-            id: null,
+    // Configure CORS to expose Mcp-Session-Id header for browser-based clients
+    app.use(
+        cors({
+            origin: '*', // Allow all origins - adjust as needed for production
+            exposedHeaders: ['Mcp-Session-Id'],
         }),
     );
+
+    // Readiness probe handler
+    app.get('/', (req: Request, res: Response) => {
+        if (req.headers['x-apify-container-server-readiness-probe']) {
+            log.info('Readiness probe');
+            res.end('ok\n');
+            return;
+        }
+        res.status(404).end();
+    });
+
+    app.post('/mcp', async (req: Request, res: Response) => {
+        const server = getServer();
+        try {
+            const transport: StreamableHTTPServerTransport = new StreamableHTTPServerTransport({
+                sessionIdGenerator: undefined,
+            });
+            await server.connect(transport);
+            await transport.handleRequest(req, res, req.body);
+            res.on('close', () => {
+                log.info('Request closed');
+                transport.close();
+                server.close();
+            });
+        } catch (error) {
+            log.error('Error handling MCP request:', {
+                error,
+            });
+            if (!res.headersSent) {
+                res.status(500).json({
+                    jsonrpc: '2.0',
+                    error: {
+                        code: -32603,
+                        message: 'Internal server error',
+                    },
+                    id: null,
+                });
+            }
+        }
+    });
+
+    const methodNotAllowed = (method: string) => (_req: Request, res: Response) => {
+        log.info(`Received ${method} MCP request`);
+        res.writeHead(405).end(
+            JSON.stringify({
+                jsonrpc: '2.0',
+                error: {
+                    code: -32000,
+                    message: 'Method not allowed.',
+                },
+                id: null,
+            }),
+        );
+    };
+
+    app.get('/mcp', methodNotAllowed('GET'));
+    app.delete('/mcp', methodNotAllowed('DELETE'));
+
+    // Start the server
+    const PORT = process.env.APIFY_CONTAINER_PORT ? parseInt(process.env.APIFY_CONTAINER_PORT) : 3000;
+    app.listen(PORT, (error) => {
+        if (error) {
+            log.error('Failed to start server:', {
+                error,
+            });
+            process.exit(1);
+        }
+        log.info(`MCP Server listening on port ${PORT}`);
+    });
 };
 
-app.get('/mcp', methodNotAllowed('GET'));
-app.delete('/mcp', methodNotAllowed('DELETE'));
+const runNormal = async (): Promise<void> => {
+    const inputSchema = z.object({
+        firstNumber: z.number(),
+        secondNumber: z.number(),
+    });
+    const rawInput = await Actor.getInput();
+    const { firstNumber, secondNumber } = inputSchema.parse(rawInput ?? {});
+    const sum = firstNumber + secondNumber;
+    log.info('Computed sum', { firstNumber, secondNumber, sum });
+    await Actor.pushData({ firstNumber, secondNumber, sum });
+    await Actor.exit();
+};
 
-// Start the server
-const PORT = process.env.APIFY_CONTAINER_PORT ? parseInt(process.env.APIFY_CONTAINER_PORT) : 3000;
-app.listen(PORT, (error) => {
-    if (error) {
-        log.error('Failed to start server:', {
-            error,
-        });
-        process.exit(1);
-    }
-    log.info(`MCP Server listening on port ${PORT}`);
-});
+const isStandby = Actor.getEnv().metaOrigin === 'STANDBY';
+if (isStandby) {
+    log.info('Starting in standby/MCP server mode');
+    await runStandby();
+} else {
+    log.info('Starting in normal run mode');
+    await runNormal();
+}
 
 // Handle server shutdown
 process.on('SIGINT', async () => {
     log.info('Shutting down server...');
-    await Actor.exit()
+    await Actor.exit();
 });

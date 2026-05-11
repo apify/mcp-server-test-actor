@@ -9,15 +9,30 @@
 	"usesStandbyMode": true,
 	"meta": {
 		"templateId": "ts-mcp-empty",
-		"generatedBy": "<FILL-IN-MODEL>"
+		"generatedBy": "Claude Code with Claude Opus 4.7 (1M context)"
 	},
 	"input": {
 		"title": "Actor input schema",
-		"description": "This is Actor input schema",
+		"description": "Input for normal (non-standby) actor runs. Ignored in standby/MCP server mode, where input is received via HTTP.",
 		"type": "object",
 		"schemaVersion": 1,
-		"properties": {},
-		"required": []
+		"properties": {
+			"firstNumber": {
+				"title": "First number",
+				"type": "integer",
+				"description": "First addend. Used only in normal-run mode.",
+				"default": 1,
+				"prefill": 1
+			},
+			"secondNumber": {
+				"title": "Second number",
+				"type": "integer",
+				"description": "Second addend. Used only in normal-run mode.",
+				"default": 2,
+				"prefill": 2
+			}
+		},
+		"required": ["firstNumber", "secondNumber"]
 	},
 	"dockerfile": "../Dockerfile",
 	"webServerMcpPath": "/mcp"
