@@ -1,0 +1,24 @@
+{
+	"$schema": "https://apify.com/schemas/v1/actor.ide.json",
+	"actorSpecification": 1,
+	"name": "mcp-server-test-actor",
+	"title": "Apify MCP server test actor",
+	"description": "Actor used for MCP server testing. Supports two execution modes: as an MCP server using the Apify standby mode and a normal actor mode",
+	"version": "0.0",
+	"buildTag": "latest",
+	"usesStandbyMode": true,
+	"meta": {
+		"templateId": "ts-mcp-empty",
+		"generatedBy": "<FILL-IN-MODEL>"
+	},
+	"input": {
+		"title": "Actor input schema",
+		"description": "This is Actor input schema",
+		"type": "object",
+		"schemaVersion": 1,
+		"properties": {},
+		"required": []
+	},
+	"dockerfile": "../Dockerfile",
+	"webServerMcpPath": "/mcp"
+}
