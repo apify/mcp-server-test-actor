@@ -172,5 +172,5 @@ app.listen(PORT, (error) => {
 // Handle server shutdown
 process.on('SIGINT', async () => {
     log.info('Shutting down server...');
-    process.exit(0);
+    await Actor.exit()
 });
