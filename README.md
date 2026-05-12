@@ -6,6 +6,13 @@ A simple Actor for testing the [Apify MCP server](https://mcp.apify.com/) integr
 
 This Actor exposes a minimal MCP server as it's designed to be the simplest possible end-to-end test of the Apify MCP server integration.
 
+## Run modes
+
+The Actor supports two execution modes, selected automatically based on how the Actor is launched:
+
+- **Standby (MCP server)** — When launched via [Apify Standby](https://docs.apify.com/platform/actors/running/standby), the Actor runs as an HTTP server exposing the MCP endpoint at `POST /mcp`.
+- **Normal (add two numbers)** — When launched as a regular one-shot run, the Actor reads `firstNumber` and `secondNumber` (and an optional `delay` in seconds) from input, pushes `{ firstNumber, secondNumber, sum }` to the default dataset, and exits.
+
 ## Getting started
 
 ```bash
