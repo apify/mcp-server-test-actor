@@ -38,6 +38,14 @@
 				"description": "Second addend. Used only in normal mode.",
 				"default": 2,
 				"prefill": 2
+			},
+			"delay": {
+				"title": "Delay (seconds)",
+				"type": "integer",
+				"description": "Number of seconds to wait before computing the sum. Used only in normal mode.",
+				"default": 0,
+				"prefill": 0,
+				"minimum": 0
 			}
 		},
 		"required": ["mode"]

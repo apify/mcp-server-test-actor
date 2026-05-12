@@ -178,7 +178,11 @@ const runStandby = async (): Promise<void> => {
     });
 };
 
-const runNormal = async (firstNumber: number, secondNumber: number): Promise<void> => {
+const runNormal = async (firstNumber: number, secondNumber: number, delaySeconds: number): Promise<void> => {
+    if (delaySeconds > 0) {
+        log.info(`Waiting ${delaySeconds}s before computing sum`);
+        await setTimeout(delaySeconds * 1000);
+    }
     const sum = firstNumber + secondNumber;
     log.info('Computed sum', { firstNumber, secondNumber, sum });
     await Actor.pushData({ firstNumber, secondNumber, sum });
@@ -189,6 +193,7 @@ const inputSchema = z.object({
     mode: z.enum(['mcp', 'normal']).default('mcp'),
     firstNumber: z.number().optional(),
     secondNumber: z.number().optional(),
+    delay: z.number().int().min(0).default(0),
 });
 const rawInput = await Actor.getInput();
 const input = inputSchema.parse(rawInput ?? {});
@@ -203,7 +208,7 @@ if (input.mode === 'mcp') {
         await Actor.exit({ exitCode: 1 });
         throw new Error('firstNumber and secondNumber are required in normal mode');
     }
-    await runNormal(input.firstNumber, input.secondNumber);
+    await runNormal(input.firstNumber, input.secondNumber, input.delay);
 }
 
 // Handle server shutdown
