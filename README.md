@@ -8,10 +8,10 @@ This Actor exposes a minimal MCP server as it's designed to be the simplest poss
 
 ## Run modes
 
-The Actor supports two execution modes, selected via the `mode` input dropdown:
+The Actor supports two execution modes, selected automatically based on how the Actor is launched:
 
-- **MCP server (standby)** — Runs the Actor as an HTTP server exposing the MCP endpoint at `POST /mcp`. This is the default and is used by [Apify Standby](https://docs.apify.com/platform/actors/running/standby) when an MCP client connects to the standby URL.
-- **Normal (add two numbers)** — Reads `firstNumber` and `secondNumber` from input, pushes `{ firstNumber, secondNumber, sum }` to the default dataset, and exits.
+- **Standby (MCP server)** — When launched via [Apify Standby](https://docs.apify.com/platform/actors/running/standby), the Actor runs as an HTTP server exposing the MCP endpoint at `POST /mcp`.
+- **Normal (add two numbers)** — When launched as a regular one-shot run, the Actor reads `firstNumber` and `secondNumber` (and an optional `delay` in seconds) from input, pushes `{ firstNumber, secondNumber, sum }` to the default dataset, and exits.
 
 ## Getting started
 

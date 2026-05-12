@@ -13,42 +13,34 @@
 	},
 	"input": {
 		"title": "Actor input schema",
-		"description": "Select the run mode and (in normal mode) provide the two numbers to add.",
+		"description": "Input for normal (non-standby) actor runs. Ignored in standby mode, where the Actor runs as an MCP server and input is received via HTTP.",
 		"type": "object",
 		"schemaVersion": 1,
 		"properties": {
-			"mode": {
-				"title": "Run mode",
-				"type": "string",
-				"description": "How the actor should run. 'MCP server' starts an HTTP server exposing the MCP endpoint at POST /mcp (used in Apify Standby). 'Normal' reads firstNumber and secondNumber, pushes their sum to the dataset, and exits.",
-				"enum": ["mcp", "normal"],
-				"enumTitles": ["MCP server (standby)", "Normal (add two numbers)"],
-				"default": "mcp"
-			},
 			"firstNumber": {
 				"title": "First number",
 				"type": "integer",
-				"description": "First addend. Used only in normal mode.",
+				"description": "First addend.",
 				"default": 1,
 				"prefill": 1
 			},
 			"secondNumber": {
 				"title": "Second number",
 				"type": "integer",
-				"description": "Second addend. Used only in normal mode.",
+				"description": "Second addend.",
 				"default": 2,
 				"prefill": 2
 			},
 			"delay": {
 				"title": "Delay (seconds)",
 				"type": "integer",
-				"description": "Number of seconds to wait before computing the sum. Used only in normal mode.",
+				"description": "Number of seconds to wait before computing the sum.",
 				"default": 0,
 				"prefill": 0,
 				"minimum": 0
 			}
 		},
-		"required": ["mode"]
+		"required": ["firstNumber", "secondNumber"]
 	},
 	"dockerfile": "../Dockerfile",
 	"webServerMcpPath": "/mcp"

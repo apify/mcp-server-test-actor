@@ -7,6 +7,7 @@ import { CallToolResult, ReadResourceResult } from '@modelcontextprotocol/sdk/ty
 import cors from 'cors';
 import { log, Actor } from 'apify';
 import { runNormal } from './normal.js';
+import { isActorStandby } from './utils.js';
 
 // Initialize the Apify Actor environment
 // This call configures the Actor for its environment and should be called at startup
@@ -179,26 +180,19 @@ const runStandby = async (): Promise<void> => {
     });
 };
 
-const inputSchema = z.object({
-    mode: z.enum(['mcp', 'normal']).default('mcp'),
-    firstNumber: z.number().optional(),
-    secondNumber: z.number().optional(),
-    delay: z.number().int().min(0).default(0),
-});
-const rawInput = await Actor.getInput();
-const input = inputSchema.parse(rawInput ?? {});
-
-if (input.mode === 'mcp') {
-    log.info('Starting in MCP server mode');
+if (isActorStandby()) {
+    log.info('Actor is running in the STANDBY mode.');
     await runStandby();
 } else {
-    log.info('Starting in normal run mode');
-    if (input.firstNumber === undefined || input.secondNumber === undefined) {
-        log.error('firstNumber and secondNumber are required in normal mode');
-        await Actor.exit({ exitCode: 1 });
-        throw new Error('firstNumber and secondNumber are required in normal mode');
-    }
-    await runNormal(input.firstNumber, input.secondNumber, input.delay, {
+    log.info('Actor is running in the NORMAL mode.');
+    const inputSchema = z.object({
+        firstNumber: z.number(),
+        secondNumber: z.number(),
+        delay: z.number().int().min(0).default(0),
+    });
+    const rawInput = await Actor.getInput();
+    const { firstNumber, secondNumber, delay } = inputSchema.parse(rawInput ?? {});
+    await runNormal(firstNumber, secondNumber, delay, {
         setStatusMessage: (msg) => Actor.setStatusMessage(msg),
         pushData: (data) => Actor.pushData(data),
         exit: (msg) => Actor.exit(msg),
