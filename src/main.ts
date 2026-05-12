@@ -29,14 +29,14 @@ const getServer = () => {
         {
             description: 'Adds two numbers together and returns the sum with structured output',
             inputSchema: {
-                a: z.number().describe('First number to add'),
-                b: z.number().describe('Second number to add'),
+                a: z.number().int().describe('First number to add'),
+                b: z.number().int().describe('Second number to add'),
             },
             outputSchema: {
-                result: z.number().describe('The sum of a and b'),
+                result: z.number().int().describe('The sum of a and b'),
                 operands: z.object({
-                    a: z.number(),
-                    b: z.number(),
+                    a: z.number().int(),
+                    b: z.number().int(),
                 }),
                 operation: z.string().describe('The operation performed'),
             },
@@ -180,8 +180,8 @@ if (isActorStandby()) {
 } else {
     log.info('Actor is running in the NORMAL mode.');
     const inputSchema = z.object({
-        firstNumber: z.number(),
-        secondNumber: z.number(),
+        firstNumber: z.number().int(),
+        secondNumber: z.number().int(),
         delay: z.number().int().min(0).default(0),
     });
     const rawInput = await Actor.getInput();
