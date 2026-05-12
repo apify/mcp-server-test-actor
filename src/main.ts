@@ -6,6 +6,7 @@ import * as z from 'zod';
 import { CallToolResult, ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
 import cors from 'cors';
 import { log, Actor } from 'apify';
+import { runNormal } from './normal.js';
 
 // Initialize the Apify Actor environment
 // This call configures the Actor for its environment and should be called at startup
@@ -178,20 +179,6 @@ const runStandby = async (): Promise<void> => {
     });
 };
 
-const runNormal = async (firstNumber: number, secondNumber: number, delaySeconds: number): Promise<void> => {
-    await Actor.setStatusMessage('Processing');
-
-    if (delaySeconds > 0) {
-        log.info(`Waiting ${delaySeconds}s before computing sum`);
-        await setTimeout(delaySeconds * 1000);
-    }
-
-    const sum = firstNumber + secondNumber;
-    log.info('Computed sum', { firstNumber, secondNumber, sum });
-    await Actor.pushData({ firstNumber, secondNumber, sum });
-    await Actor.exit('Successfully completed');
-};
-
 const inputSchema = z.object({
     mode: z.enum(['mcp', 'normal']).default('mcp'),
     firstNumber: z.number().optional(),
@@ -211,7 +198,12 @@ if (input.mode === 'mcp') {
         await Actor.exit({ exitCode: 1 });
         throw new Error('firstNumber and secondNumber are required in normal mode');
     }
-    await runNormal(input.firstNumber, input.secondNumber, input.delay);
+    await runNormal(input.firstNumber, input.secondNumber, input.delay, {
+        setStatusMessage: (msg) => Actor.setStatusMessage(msg),
+        pushData: (data) => Actor.pushData(data),
+        exit: (msg) => Actor.exit(msg),
+        sleep: setTimeout,
+    });
 }
 
 // Handle server shutdown
