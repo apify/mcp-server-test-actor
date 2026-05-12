@@ -13,12 +13,6 @@ import { isActorStandby } from './utils.js';
 // This call configures the Actor for its environment and should be called at startup
 await Actor.init();
 
-Actor.on('aborting', async () => {
-    log.info('Actor is aborting, exiting...');
-    await setTimeout(1000);
-    await Actor.exit();
-});
-
 const getServer = () => {
     // Create an MCP server with implementation details
     const server = new McpServer(
