@@ -179,14 +179,17 @@ const runStandby = async (): Promise<void> => {
 };
 
 const runNormal = async (firstNumber: number, secondNumber: number, delaySeconds: number): Promise<void> => {
+    await Actor.setStatusMessage('Processing');
+
     if (delaySeconds > 0) {
         log.info(`Waiting ${delaySeconds}s before computing sum`);
         await setTimeout(delaySeconds * 1000);
     }
+
     const sum = firstNumber + secondNumber;
     log.info('Computed sum', { firstNumber, secondNumber, sum });
     await Actor.pushData({ firstNumber, secondNumber, sum });
-    await Actor.exit();
+    await Actor.exit('Successfully completed');
 };
 
 const inputSchema = z.object({
