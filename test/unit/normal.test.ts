@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest';
 import { log } from 'apify';
-import { runNormal, type NormalDeps } from './normal.js';
+import { runNormal, type NormalDeps } from '../../src/normal.js';
 
 beforeAll(() => {
     // Silence Apify logger output during tests
