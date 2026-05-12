@@ -178,26 +178,32 @@ const runStandby = async (): Promise<void> => {
     });
 };
 
-const runNormal = async (): Promise<void> => {
-    const inputSchema = z.object({
-        firstNumber: z.number(),
-        secondNumber: z.number(),
-    });
-    const rawInput = await Actor.getInput();
-    const { firstNumber, secondNumber } = inputSchema.parse(rawInput ?? {});
+const runNormal = async (firstNumber: number, secondNumber: number): Promise<void> => {
     const sum = firstNumber + secondNumber;
     log.info('Computed sum', { firstNumber, secondNumber, sum });
     await Actor.pushData({ firstNumber, secondNumber, sum });
     await Actor.exit();
 };
 
-const isStandby = Actor.getEnv().metaOrigin === 'STANDBY';
-if (isStandby) {
-    log.info('Starting in standby/MCP server mode');
+const inputSchema = z.object({
+    mode: z.enum(['mcp', 'normal']).default('mcp'),
+    firstNumber: z.number().optional(),
+    secondNumber: z.number().optional(),
+});
+const rawInput = await Actor.getInput();
+const input = inputSchema.parse(rawInput ?? {});
+
+if (input.mode === 'mcp') {
+    log.info('Starting in MCP server mode');
     await runStandby();
 } else {
     log.info('Starting in normal run mode');
-    await runNormal();
+    if (input.firstNumber === undefined || input.secondNumber === undefined) {
+        log.error('firstNumber and secondNumber are required in normal mode');
+        await Actor.exit({ exitCode: 1 });
+        throw new Error('firstNumber and secondNumber are required in normal mode');
+    }
+    await runNormal(input.firstNumber, input.secondNumber);
 }
 
 // Handle server shutdown
