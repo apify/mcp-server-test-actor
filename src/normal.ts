@@ -7,10 +7,14 @@ export interface NormalDeps {
     sleep: (ms: number) => Promise<unknown>;
 }
 
+export interface Input {
+    firstNumber: number;
+    secondNumber: number;
+    delaySeconds: number;
+}
+
 export async function runNormal(
-    firstNumber: number,
-    secondNumber: number,
-    delaySeconds: number,
+    { firstNumber, secondNumber, delaySeconds }: Input,
     deps: NormalDeps,
 ): Promise<void> {
     await deps.setStatusMessage('Processing');

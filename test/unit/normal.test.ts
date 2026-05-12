@@ -21,7 +21,7 @@ describe('runNormal', () => {
     describe('sum computation', () => {
         it('pushes the sum of two positive integers', async () => {
             const deps = createMockDeps();
-            await runNormal(2, 3, 0, deps);
+            await runNormal({ firstNumber: 2, secondNumber: 3, delaySeconds: 0 }, deps);
             expect(deps.pushData).toHaveBeenCalledExactlyOnceWith({
                 firstNumber: 2,
                 secondNumber: 3,
@@ -33,13 +33,13 @@ describe('runNormal', () => {
     describe('status and exit lifecycle', () => {
         it('sets the "Processing" status message before computing', async () => {
             const deps = createMockDeps();
-            await runNormal(1, 1, 0, deps);
+            await runNormal({ firstNumber: 1, secondNumber: 1, delaySeconds: 0 }, deps);
             expect(deps.setStatusMessage).toHaveBeenCalledExactlyOnceWith('Processing');
         });
 
         it('calls exit with the success message at the end', async () => {
             const deps = createMockDeps();
-            await runNormal(1, 1, 0, deps);
+            await runNormal({ firstNumber: 1, secondNumber: 1, delaySeconds: 0 }, deps);
             expect(deps.exit).toHaveBeenCalledExactlyOnceWith('Successfully completed');
         });
     });
@@ -47,13 +47,13 @@ describe('runNormal', () => {
     describe('delay behaviour', () => {
         it('does not sleep when delay is 0', async () => {
             const deps = createMockDeps();
-            await runNormal(1, 1, 0, deps);
+            await runNormal({ firstNumber: 1, secondNumber: 1, delaySeconds: 0 }, deps);
             expect(deps.sleep).not.toHaveBeenCalled();
         });
 
         it('sleeps for delaySeconds when delay > 0', async () => {
             const deps = createMockDeps();
-            await runNormal(1, 1, 5, deps);
+            await runNormal({ firstNumber: 1, secondNumber: 1, delaySeconds: 5 }, deps);
             expect(deps.sleep).toHaveBeenCalledExactlyOnceWith(5000);
         });
 
@@ -73,7 +73,7 @@ describe('runNormal', () => {
                     order.push('sleep');
                 }),
             };
-            await runNormal(1, 1, 2, deps);
+            await runNormal({ firstNumber: 1, secondNumber: 1, delaySeconds: 2 }, deps);
             expect(order).toEqual(['status', 'sleep', 'push', 'exit']);
         });
 
@@ -93,7 +93,7 @@ describe('runNormal', () => {
                     order.push('sleep');
                 }),
             };
-            await runNormal(1, 1, 0, deps);
+            await runNormal({ firstNumber: 1, secondNumber: 1, delaySeconds: 0 }, deps);
             expect(order).toEqual(['status', 'push', 'exit']);
         });
     });

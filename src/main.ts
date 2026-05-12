@@ -186,12 +186,15 @@ if (isActorStandby()) {
     });
     const rawInput = await Actor.getInput();
     const { firstNumber, secondNumber, delay } = inputSchema.parse(rawInput ?? {});
-    await runNormal(firstNumber, secondNumber, delay, {
-        setStatusMessage: (msg) => Actor.setStatusMessage(msg),
-        pushData: (data) => Actor.pushData(data),
-        exit: (msg) => Actor.exit(msg),
-        sleep: setTimeout,
-    });
+    await runNormal(
+        { firstNumber, secondNumber, delaySeconds: delay },
+        {
+            setStatusMessage: (msg) => Actor.setStatusMessage(msg),
+            pushData: (data) => Actor.pushData(data),
+            exit: (msg) => Actor.exit(msg),
+            sleep: setTimeout,
+        },
+    );
 }
 
 // Handle server shutdown
