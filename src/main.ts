@@ -161,7 +161,7 @@ const runStandby = async (): Promise<void> => {
     app.delete('/mcp', methodNotAllowed('DELETE'));
 
     // Start the server
-    const PORT = process.env.APIFY_CONTAINER_PORT ? parseInt(process.env.APIFY_CONTAINER_PORT) : 3000;
+    const PORT = process.env.ACTOR_STANDBY_PORT ? parseInt(process.env.ACTOR_STANDBY_PORT) : 3000;
     app.listen(PORT, (error) => {
         if (error) {
             log.error('Failed to start server:', {
