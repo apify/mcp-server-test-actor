@@ -8,7 +8,7 @@ export const getServer = () => {
     // Create an MCP server with implementation details
     const server = new McpServer(
         {
-            name: 'ts-mcp-empty',
+            name: 'mcp-server-test-actor',
             version: '1.0.0',
         },
         { capabilities: { logging: {} } },
