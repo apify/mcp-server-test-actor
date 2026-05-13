@@ -1,10 +1,12 @@
-import express, { Request, Response } from 'express';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { Actor, log } from 'apify';
 import cors from 'cors';
-import { log, Actor } from 'apify';
+import type { Request, Response } from 'express';
+import express from 'express';
+
 import { inputSchema } from './input-schema.js';
-import { runNormal } from './run-actor.js';
 import { getServer } from './mcp-server.js';
+import { runNormal } from './run-actor.js';
 
 // Initialize the Apify Actor environment
 // This call configures the Actor for its environment and should be called at startup
@@ -46,8 +48,8 @@ const runStandby = async (): Promise<void> => {
             await transport.handleRequest(req, res, req.body);
             res.on('close', () => {
                 log.info('Request closed');
-                transport.close();
-                server.close();
+                void transport.close();
+                void server.close();
             });
         } catch (error) {
             log.error('Error handling MCP request:', {
@@ -84,7 +86,7 @@ const runStandby = async (): Promise<void> => {
     app.delete('/mcp', methodNotAllowed('DELETE'));
 
     // Start the server
-    const PORT = process.env.ACTOR_STANDBY_PORT ? parseInt(process.env.ACTOR_STANDBY_PORT) : 3000;
+    const PORT = process.env.ACTOR_STANDBY_PORT ? parseInt(process.env.ACTOR_STANDBY_PORT, 10) : 3000;
     app.listen(PORT, (error) => {
         if (error) {
             log.error('Failed to start server:', {

@@ -1,7 +1,8 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { CallToolResult, ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
+import { Actor, log } from 'apify';
 import * as z from 'zod';
-import { CallToolResult, ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
-import { log, Actor } from 'apify';
+
 import { inputSchema } from './input-schema.js';
 
 export const getServer = () => {

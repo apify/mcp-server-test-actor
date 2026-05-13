@@ -1,5 +1,7 @@
 import { setTimeout } from 'node:timers/promises';
+
 import { Actor, log } from 'apify';
+
 import type { Input } from './input-schema.js';
 
 export async function runNormal({ firstNumber, secondNumber, waitSeconds }: Input): Promise<void> {
