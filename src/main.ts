@@ -6,11 +6,14 @@ import { CallToolResult, ReadResourceResult } from '@modelcontextprotocol/sdk/ty
 import cors from 'cors';
 import { log, Actor } from 'apify';
 import { runNormal } from './run-actor.js';
-import { isActorStandby } from './utils.js';
 
 // Initialize the Apify Actor environment
 // This call configures the Actor for its environment and should be called at startup
 await Actor.init();
+
+export function isActorStandby(): boolean {
+    return Actor.getEnv().metaOrigin === 'STANDBY';
+}
 
 const getServer = () => {
     // Create an MCP server with implementation details
