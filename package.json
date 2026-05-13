@@ -33,7 +33,11 @@
 		"start:prod": "node dist/main.js",
 		"start:dev": "tsx src/main.ts",
 		"build": "tsc",
-		"test": "vitest run"
+		"test": "vitest run",
+		"lint": "eslint src",
+		"lint:fix": "eslint src --fix",
+		"format": "prettier --check src",
+		"format:fix": "prettier --write src"
 	},
 	"author": "It's not you it's me",
 	"license": "ISC"
