@@ -9,7 +9,7 @@
 	"usesStandbyMode": true,
 	"meta": {
 		"templateId": "ts-mcp-empty",
-		"generatedBy": "GitHub Copilot Coding Agent with GPT-5"
+		"generatedBy": "GitHub Copilot Coding Agent with GPT-4o"
 	},
 	"input": {
 		"title": "Actor input schema",
