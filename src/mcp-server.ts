@@ -2,6 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import * as z from 'zod';
 import { CallToolResult, ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
 import { log, Actor } from 'apify';
+import { inputSchema } from './input-schema.js';
 
 export const getServer = () => {
     // Create an MCP server with implementation details
@@ -18,29 +19,26 @@ export const getServer = () => {
         'add',
         {
             description: 'Adds two numbers together and returns the sum with structured output',
-            inputSchema: {
-                a: z.number().int().describe('First number to add'),
-                b: z.number().int().describe('Second number to add'),
-            },
+            inputSchema: inputSchema.shape,
             outputSchema: {
-                result: z.number().int().describe('The sum of a and b'),
+                result: z.number().int().describe('The sum of firstNumber and secondNumber'),
                 operands: z.object({
-                    a: z.number().int(),
-                    b: z.number().int(),
+                    firstNumber: z.number().int(),
+                    secondNumber: z.number().int(),
                 }),
                 operation: z.string().describe('The operation performed'),
             },
         },
-        async ({ a, b }): Promise<CallToolResult> => {
+        async ({ firstNumber, secondNumber }): Promise<CallToolResult> => {
             try {
                 // Charge for the tool call
                 await Actor.charge({ eventName: 'tool-call' });
                 log.info('Charged for tool-call event');
 
-                const sum = a + b;
+                const sum = firstNumber + secondNumber;
                 const structuredContent = {
                     result: sum,
-                    operands: { a, b },
+                    operands: { firstNumber, secondNumber },
                     operation: 'addition',
                 };
 
@@ -48,7 +46,7 @@ export const getServer = () => {
                     content: [
                         {
                             type: 'text',
-                            text: `The sum of ${a} and ${b} is ${sum}`,
+                            text: `The sum of ${firstNumber} and ${secondNumber} is ${sum}`,
                         },
                     ],
                     structuredContent,

@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import * as z from 'zod';
 import cors from 'cors';
 import { log, Actor } from 'apify';
+import { inputSchema } from './input-schema.js';
 import { runNormal } from './run-actor.js';
 import { getServer } from './mcp-server.js';
 
@@ -101,14 +101,9 @@ if (isActorStandby()) {
     await runStandby();
 } else {
     log.info('Actor is running in the NORMAL mode.');
-    const inputSchema = z.object({
-        firstNumber: z.number().int(),
-        secondNumber: z.number().int(),
-        waitSeconds: z.number().int().min(0).default(0),
-    });
     const rawInput = await Actor.getInput();
-    const { firstNumber, secondNumber, waitSeconds } = inputSchema.parse(rawInput ?? {});
-    await runNormal({ firstNumber, secondNumber, delaySeconds: waitSeconds });
+    const input = inputSchema.parse(rawInput ?? {});
+    await runNormal(input);
 }
 
 // Handle server shutdown
