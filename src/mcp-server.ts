@@ -1,3 +1,5 @@
+import { setTimeout } from 'node:timers/promises';
+
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { CallToolResult, ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
 import { Actor, log } from 'apify';
@@ -30,11 +32,16 @@ export const getServer = () => {
                 operation: z.string().describe('The operation performed'),
             },
         },
-        async ({ firstNumber, secondNumber }): Promise<CallToolResult> => {
+        async ({ firstNumber, secondNumber, waitSeconds }): Promise<CallToolResult> => {
             try {
                 // Charge for the tool call
                 await Actor.charge({ eventName: 'tool-call' });
                 log.info('Charged for tool-call event');
+
+                if (waitSeconds > 0) {
+                    log.info(`Waiting ${waitSeconds}s before computing sum`);
+                    await setTimeout(waitSeconds * 1000);
+                }
 
                 const sum = firstNumber + secondNumber;
                 const structuredContent = {

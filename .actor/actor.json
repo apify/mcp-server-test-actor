@@ -9,7 +9,7 @@
 	"usesStandbyMode": true,
 	"meta": {
 		"templateId": "ts-mcp-empty",
-		"generatedBy": "Claude Code with Claude Opus 4.7 (1M context)"
+		"generatedBy": "GitHub Copilot Coding Agent with GPT-5.5"
 	},
 	"input": {
 		"title": "Actor input schema",
