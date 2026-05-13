@@ -104,11 +104,11 @@ if (isActorStandby()) {
     const inputSchema = z.object({
         firstNumber: z.number().int(),
         secondNumber: z.number().int(),
-        delay: z.number().int().min(0).default(0),
+        waitSeconds: z.number().int().min(0).default(0),
     });
     const rawInput = await Actor.getInput();
-    const { firstNumber, secondNumber, delay } = inputSchema.parse(rawInput ?? {});
-    await runNormal({ firstNumber, secondNumber, delaySeconds: delay });
+    const { firstNumber, secondNumber, waitSeconds } = inputSchema.parse(rawInput ?? {});
+    await runNormal({ firstNumber, secondNumber, delaySeconds: waitSeconds });
 }
 
 // Handle server shutdown
