@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Actor } from 'apify';
 import { setTimeout } from 'node:timers/promises';
-import { runNormal } from '../../src/normal.js';
+import { runNormal } from '../../src/run-actor.js';
 
 vi.mock('apify', () => ({
     Actor: {

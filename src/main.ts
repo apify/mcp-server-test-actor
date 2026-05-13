@@ -5,7 +5,7 @@ import * as z from 'zod';
 import { CallToolResult, ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
 import cors from 'cors';
 import { log, Actor } from 'apify';
-import { runNormal } from './normal.js';
+import { runNormal } from './run-actor.js';
 import { isActorStandby } from './utils.js';
 
 // Initialize the Apify Actor environment
