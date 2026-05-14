@@ -104,8 +104,16 @@ if (isActorStandby()) {
 } else {
     log.info('Actor is running in the NORMAL mode.');
     const rawInput = await Actor.getInput();
-    const input = inputSchema.parse(rawInput ?? {});
-    await runNormal(input);
+    let input;
+    try {
+        input = inputSchema.parse(rawInput ?? {});
+    } catch (err) {
+        log.error('Invalid Actor input', { error: err });
+        await Actor.fail('Invalid Actor input');
+    }
+    if (input) {
+        await runNormal(input);
+    }
 }
 
 // Handle server shutdown
