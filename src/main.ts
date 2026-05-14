@@ -1,95 +1,20 @@
-import express, { Request, Response } from 'express';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import * as z from 'zod';
-import { CallToolResult, ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
+import { Actor, log } from 'apify';
 import cors from 'cors';
-import { log, Actor } from 'apify';
-import { runNormal } from './normal.js';
-import { isActorStandby } from './utils.js';
+import type { Request, Response } from 'express';
+import express from 'express';
+
+import { inputSchema } from './input-schema.js';
+import { getServer } from './mcp-server.js';
+import { runNormal } from './run-actor.js';
 
 // Initialize the Apify Actor environment
 // This call configures the Actor for its environment and should be called at startup
 await Actor.init();
 
-const getServer = () => {
-    // Create an MCP server with implementation details
-    const server = new McpServer(
-        {
-            name: 'ts-mcp-empty',
-            version: '1.0.0',
-        },
-        { capabilities: { logging: {} } },
-    );
-
-    // Register a tool for adding two numbers with structured output
-    server.registerTool(
-        'add',
-        {
-            description: 'Adds two numbers together and returns the sum with structured output',
-            inputSchema: {
-                a: z.number().int().describe('First number to add'),
-                b: z.number().int().describe('Second number to add'),
-            },
-            outputSchema: {
-                result: z.number().int().describe('The sum of a and b'),
-                operands: z.object({
-                    a: z.number().int(),
-                    b: z.number().int(),
-                }),
-                operation: z.string().describe('The operation performed'),
-            },
-        },
-        async ({ a, b }): Promise<CallToolResult> => {
-            try {
-                // Charge for the tool call
-                await Actor.charge({ eventName: 'tool-call' });
-                log.info('Charged for tool-call event');
-
-                const sum = a + b;
-                const structuredContent = {
-                    result: sum,
-                    operands: { a, b },
-                    operation: 'addition',
-                };
-
-                return {
-                    content: [
-                        {
-                            type: 'text',
-                            text: `The sum of ${a} and ${b} is ${sum}`,
-                        },
-                    ],
-                    structuredContent,
-                };
-            } catch (error) {
-                log.error('Error in add tool:', {
-                    error,
-                });
-                throw error;
-            }
-        },
-    );
-
-    // Create a simple dummy resource at a fixed URI
-    server.registerResource(
-        'calculator-info',
-        'https://example.com/calculator',
-        { mimeType: 'text/plain' },
-        async (): Promise<ReadResourceResult> => {
-            return {
-                contents: [
-                    {
-                        uri: 'https://example.com/calculator',
-                        text: 'This is a simple calculator MCP server that can add two numbers together.',
-                    },
-                ],
-            };
-        },
-    );
-
-    return server;
-};
+export function isActorStandby(): boolean {
+    return Actor.getEnv().metaOrigin === 'STANDBY';
+}
 
 const runStandby = async (): Promise<void> => {
     const app = express();
@@ -123,8 +48,8 @@ const runStandby = async (): Promise<void> => {
             await transport.handleRequest(req, res, req.body);
             res.on('close', () => {
                 log.info('Request closed');
-                transport.close();
-                server.close();
+                void transport.close();
+                void server.close();
             });
         } catch (error) {
             log.error('Error handling MCP request:', {
@@ -161,7 +86,7 @@ const runStandby = async (): Promise<void> => {
     app.delete('/mcp', methodNotAllowed('DELETE'));
 
     // Start the server
-    const PORT = process.env.APIFY_CONTAINER_PORT ? parseInt(process.env.APIFY_CONTAINER_PORT) : 3000;
+    const PORT = process.env.ACTOR_STANDBY_PORT ? parseInt(process.env.ACTOR_STANDBY_PORT, 10) : 3000;
     app.listen(PORT, (error) => {
         if (error) {
             log.error('Failed to start server:', {
@@ -178,14 +103,17 @@ if (isActorStandby()) {
     await runStandby();
 } else {
     log.info('Actor is running in the NORMAL mode.');
-    const inputSchema = z.object({
-        firstNumber: z.number().int(),
-        secondNumber: z.number().int(),
-        delay: z.number().int().min(0).default(0),
-    });
     const rawInput = await Actor.getInput();
-    const { firstNumber, secondNumber, delay } = inputSchema.parse(rawInput ?? {});
-    await runNormal({ firstNumber, secondNumber, delaySeconds: delay });
+    let input;
+    try {
+        input = inputSchema.parse(rawInput ?? {});
+    } catch (err) {
+        log.error('Invalid Actor input', { error: err });
+        await Actor.fail('Invalid Actor input');
+    }
+    if (input) {
+        await runNormal(input);
+    }
 }
 
 // Handle server shutdown

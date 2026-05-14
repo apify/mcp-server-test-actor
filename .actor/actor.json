@@ -31,8 +31,8 @@
 				"default": 2,
 				"prefill": 2
 			},
-			"delay": {
-				"title": "Delay (seconds)",
+			"waitSeconds": {
+				"title": "Wait seconds",
 				"type": "integer",
 				"description": "Number of seconds to wait before computing the sum.",
 				"default": 0,
