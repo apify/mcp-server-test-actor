@@ -1,0 +1,16 @@
+{
+	"$schema": "https://apify.com/schemas/v1/actor.ide.json",
+	"actorSpecification": 1,
+	"name": "mcp-server-test-actor",
+	"title": "Apify MCP server test actor",
+	"description": "Actor used for MCP server testing. Runs only as an MCP server in Apify standby mode and exposes the MCP endpoint at POST /mcp.",
+	"version": "0.0",
+	"buildTag": "latest",
+	"usesStandbyMode": true,
+	"meta": {
+		"templateId": "ts-mcp-empty",
+		"generatedBy": "Claude Code with Claude Opus 4.7 (1M context)"
+	},
+	"dockerfile": "../Dockerfile",
+	"webServerMcpPath": "/mcp"
+}

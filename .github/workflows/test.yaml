@@ -8,12 +8,19 @@ on:
 jobs:
     build-and-test:
         runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                actor: [mcp-server-actor, normal-actor]
+        defaults:
+            run:
+                working-directory: ${{ matrix.actor }}
         steps:
             - uses: actions/checkout@v6
             - uses: actions/setup-node@v6
               with:
                   node-version: 24
                   cache: npm
+                  cache-dependency-path: ${{ matrix.actor }}/package-lock.json
             - run: npm ci
             - run: npm run lint
             - run: npm run format
