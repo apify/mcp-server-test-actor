@@ -7,7 +7,7 @@ This repository contains two Apify Actors used for testing the [Apify MCP server
 - [`mcp-server-actor/`](./mcp-server-actor) — Runs as an MCP server via [Apify Standby](https://docs.apify.com/platform/actors/running/standby), exposing the MCP endpoint at `POST /mcp`.
 - [`normal-actor/`](./normal-actor) — Runs as a regular one-shot Actor. Reads `firstNumber` and `secondNumber` (and an optional `waitSeconds`) from input, pushes `{ firstNumber, secondNumber, sum }` to the default dataset, and exits.
 
-Both Actors share the same source code; the runtime mode is selected by `usesStandbyMode` in each Actor's `.actor/actor.json`.
+Each Actor supports a single execution mode — they share no source code at runtime, only structure.
 
 ## Getting started
 

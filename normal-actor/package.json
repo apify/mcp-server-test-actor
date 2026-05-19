@@ -1,15 +1,12 @@
 {
-	"name": "mcp-server-test-actor",
+	"name": "normal-test-actor",
 	"version": "0.0.1",
 	"type": "module",
-	"description": "TypeScript Model Context Protocol server.",
+	"description": "Apify Actor that adds two numbers and pushes the sum to its dataset.",
 	"engines": {
 		"node": ">=20.0.0"
 	},
 	"dependencies": {
-		"@modelcontextprotocol/sdk": "^1.17.5",
-		"express": "^5.1.0",
-		"cors": "^2.8.5",
 		"zod": "^3.25.76",
 		"apify": "^3.7.0"
 	},
@@ -17,8 +14,6 @@
 		"@apify/eslint-config": "^2.0.0",
 		"@apify/tsconfig": "^0.1.1",
 		"@types/node": "^24.0.0",
-		"@types/express": "^5.0.2",
-		"@types/cors": "^2.8.13",
 		"eslint": "^9.29.0",
 		"eslint-config-prettier": "^10.1.5",
 		"globals": "^17.0.0",

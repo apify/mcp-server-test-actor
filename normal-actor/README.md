@@ -1,17 +1,32 @@
-## Apify MCP Server Test Actor
+## Apify Normal Test Actor
 
-A simple Actor for testing the [Apify MCP server](https://mcp.apify.com/) integration. Use it to verify that your MCP client can discover and call Actor tools correctly.
+A minimal Apify Actor used as a counterpart to the [MCP server test actor](../mcp-server-actor). It exists to exercise the regular (non-standby) Actor execution path.
 
 ## What it does
 
-This Actor exposes a minimal MCP server as it's designed to be the simplest possible end-to-end test of the Apify MCP server integration.
+The Actor runs only in normal mode. It reads two integers from input, optionally waits for a configurable number of seconds, computes their sum, and pushes `{ firstNumber, secondNumber, sum }` to the default dataset before exiting.
 
-## Run modes
+## Input
 
-The Actor supports two execution modes, selected automatically based on how the Actor is launched:
+| Field          | Type    | Required | Description                                                |
+| -------------- | ------- | -------- | ---------------------------------------------------------- |
+| `firstNumber`  | integer | yes      | First addend.                                              |
+| `secondNumber` | integer | yes      | Second addend.                                             |
+| `waitSeconds`  | integer | no       | Seconds to wait before computing the sum (default: `0`).   |
 
-- **Standby (MCP server)** — When launched via [Apify Standby](https://docs.apify.com/platform/actors/running/standby), the Actor runs as an HTTP server exposing the MCP endpoint at `POST /mcp`.
-- **Normal (add two numbers)** — When launched as a regular one-shot run, the Actor reads `firstNumber` and `secondNumber` (and an optional `delay` in seconds) from input, pushes `{ firstNumber, secondNumber, sum }` to the default dataset, and exits.
+Example:
+
+```json
+{ "firstNumber": 2, "secondNumber": 3, "waitSeconds": 0 }
+```
+
+## Output
+
+A single item pushed to the default dataset:
+
+```json
+{ "firstNumber": 2, "secondNumber": 3, "sum": 5 }
+```
 
 ## Getting started
 
@@ -24,9 +39,3 @@ apify run
 ```bash
 apify push
 ```
-
-## Resources
-
-- [Apify MCP server documentation](https://docs.apify.com/platform/integrations/mcp)
-- [Apify MCP server configuration](https://mcp.apify.com/)
-- [MCP Streamable HTTP transport spec](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#streamable-http)

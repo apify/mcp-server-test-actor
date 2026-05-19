@@ -2,7 +2,7 @@
 	"name": "mcp-server-test-actor",
 	"version": "0.0.1",
 	"type": "module",
-	"description": "TypeScript Model Context Protocol server.",
+	"description": "Apify Actor that runs as an MCP server in standby mode.",
 	"engines": {
 		"node": ">=20.0.0"
 	},
