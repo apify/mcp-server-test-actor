@@ -1,0 +1,46 @@
+{
+	"$schema": "https://apify.com/schemas/v1/actor.ide.json",
+	"actorSpecification": 1,
+	"name": "mcp-server-test-actor",
+	"title": "Apify MCP server test actor",
+	"description": "Actor used for MCP server testing. Supports two execution modes: as an MCP server using the Apify standby mode and a normal actor mode",
+	"version": "0.0",
+	"buildTag": "latest",
+	"usesStandbyMode": false,
+	"meta": {
+		"templateId": "ts-mcp-empty",
+		"generatedBy": "Claude Code with Claude Opus 4.7 (1M context)"
+	},
+	"input": {
+		"title": "Actor input schema",
+		"description": "Input for normal (non-standby) actor runs. Ignored in standby mode, where the Actor runs as an MCP server and input is received via HTTP.",
+		"type": "object",
+		"schemaVersion": 1,
+		"properties": {
+			"firstNumber": {
+				"title": "First number",
+				"type": "integer",
+				"description": "First addend.",
+				"default": 1,
+				"prefill": 1
+			},
+			"secondNumber": {
+				"title": "Second number",
+				"type": "integer",
+				"description": "Second addend.",
+				"default": 2,
+				"prefill": 2
+			},
+			"waitSeconds": {
+				"title": "Wait seconds",
+				"type": "integer",
+				"description": "Number of seconds to wait before computing the sum.",
+				"default": 0,
+				"prefill": 0,
+				"minimum": 0
+			}
+		},
+		"required": ["firstNumber", "secondNumber"]
+	},
+	"dockerfile": "../Dockerfile"
+}
