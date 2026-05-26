@@ -33,12 +33,20 @@ beforeEach(() => {
 
 describe('runNormal', () => {
     describe('sum dataset (default)', () => {
-        it('pushes the sum of two positive integers to the default dataset', async () => {
+        it('pushes a nested item with sum, fibonacci, factorials, and a primality flag', async () => {
             await runNormal({ firstNumber: 2, secondNumber: 3, waitSeconds: 0 });
-            expect(Actor.pushData).toHaveBeenCalledExactlyOnceWith({
+
+            expect(Actor.pushData).toHaveBeenCalledOnce();
+            const pushed = vi.mocked(Actor.pushData).mock.calls[0][0] as Record<string, unknown>;
+            expect(pushed).toEqual({
                 firstNumber: 2,
                 secondNumber: 3,
                 sum: 5,
+                math: {
+                    fibonacci: [0, 1, 1, 2, 3],
+                    factorial: { first: 2, second: 6 },
+                },
+                isSumPrime: true,
             });
         });
     });

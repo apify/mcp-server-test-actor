@@ -20,16 +20,20 @@
 			"firstNumber": {
 				"title": "First number",
 				"type": "integer",
-				"description": "First addend.",
+				"description": "First addend. Bounded to keep derived math operations (factorial, fibonacci, primality) tractable.",
 				"default": 1,
-				"prefill": 1
+				"prefill": 1,
+				"minimum": 0,
+				"maximum": 10
 			},
 			"secondNumber": {
 				"title": "Second number",
 				"type": "integer",
-				"description": "Second addend.",
+				"description": "Second addend. Bounded to keep derived math operations (factorial, fibonacci, primality) tractable.",
 				"default": 2,
-				"prefill": 2
+				"prefill": 2,
+				"minimum": 0,
+				"maximum": 10
 			},
 			"waitSeconds": {
 				"title": "Wait seconds",

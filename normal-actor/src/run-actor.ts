@@ -3,6 +3,7 @@ import { setTimeout } from 'node:timers/promises';
 import { Actor, log } from 'apify';
 
 import type { Input } from './input-schema.js';
+import { computeOperations } from './math-operations.js';
 
 /**
  * Fictional Apify book fixture used by MCP server integration tests. Each field exercises a
@@ -74,7 +75,8 @@ export async function runNormal({ firstNumber, secondNumber, waitSeconds, maxIte
     const sum = firstNumber + secondNumber;
     log.info('Computed sum', { firstNumber, secondNumber, sum });
 
-    await Actor.pushData({ firstNumber, secondNumber, sum });
+    const operations = computeOperations(firstNumber, secondNumber);
+    await Actor.pushData({ firstNumber, secondNumber, sum, ...operations });
 
     const books = APIFY_BOOK_FIXTURE.slice(0, maxItems);
     log.info('Pushing Apify book fixture', { count: books.length });
