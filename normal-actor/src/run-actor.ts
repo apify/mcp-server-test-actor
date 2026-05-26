@@ -19,25 +19,25 @@ interface ApifyBook {
 
 const APIFY_BOOK_FIXTURE: ApifyBook[] = [
     {
-        title: 'The Apify Whisperer',
-        author: { name: 'A. Crawler', country: 'CZ' },
-        publication: { year: 2024, publisher: { name: 'Acme Press', city: 'Prague' } },
-        tags: ['scraping', 'apify', 'fiction'],
-        rating: 4.5,
-    },
-    {
-        title: 'Tales from the Headless Browser',
-        author: { name: 'P. Layw-Right', country: 'US' },
-        publication: { year: 2023, publisher: { name: 'Headless House', city: 'San Francisco' } },
-        tags: ['browser', 'automation'],
+        title: 'async/await and Other Lies I Told My Scraper',
+        author: { name: 'Nadia "node_modules" Petrov', country: 'BG' },
+        publication: { year: 2025, publisher: { name: 'Apify Press', city: 'Prague' } },
+        tags: ['agentic', 'noir', 'callback-hell'],
         rating: 4.2,
     },
     {
-        title: 'The Last Standby',
-        author: { name: 'S. Erverless', country: 'DE' },
-        publication: { year: 2025, publisher: { name: 'Cloud Books', city: 'Berlin' } },
-        tags: ['cloud', 'serverless', 'apify'],
-        rating: 4.8,
+        title: 'undefined is not a Function: A Love Story',
+        author: { name: 'Sir Crawls-a-Lot', country: 'UK' },
+        publication: { year: 2024, publisher: { name: 'Headless House', city: 'San Francisco' } },
+        tags: ['romance', 'typescript', 'tragedy'],
+        rating: 4.7,
+    },
+    {
+        title: 'It Works on My Machine — and Other Crime Scenes',
+        author: { name: 'BOT-7', country: 'CLOUD' },
+        publication: { year: 2025, publisher: { name: 'Event Loop Editions', city: 'Berlin' } },
+        tags: ['thriller', 'devops', 'rate-limited'],
+        rating: 4.9,
     },
 ];
 
