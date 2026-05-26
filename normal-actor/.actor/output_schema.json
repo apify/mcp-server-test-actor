@@ -9,10 +9,10 @@
             "description": "Scraped books (fake catalogue) with mixed JSON value types, used by the MCP server storage tool tests.",
             "template": "{{storages.datasets.books.apiUrl}}/items"
         },
-        "sum": {
+        "math": {
             "type": "string",
-            "title": "Sum",
-            "description": "Single dataset item with firstNumber, secondNumber, and the computed sum.",
+            "title": "Math",
+            "description": "Single dataset item with firstNumber, secondNumber, sum, and a nested math block (fibonacci, factorials, primality).",
             "template": "{{storages.datasets.default.apiUrl}}/items"
         },
         "records": {

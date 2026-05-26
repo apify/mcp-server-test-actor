@@ -112,17 +112,17 @@ describe('runNormal', () => {
         });
     });
 
-    describe('maxItems', () => {
-        it('slices the books fixture when maxItems is set', async () => {
-            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, maxItems: 2 });
+    describe('maxBooks', () => {
+        it('slices the books fixture when maxBooks is set', async () => {
+            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, maxBooks: 2 });
 
             const pushed = booksPushData.mock.calls[0][0] as unknown[];
             expect(pushed).toHaveLength(2);
             expect(Actor.setValue).toHaveBeenCalledWith('STATS', expect.objectContaining({ bookCount: 2 }));
         });
 
-        it('pushes nothing when maxItems is 0 and reports averageRating: null', async () => {
-            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, maxItems: 0 });
+        it('pushes nothing when maxBooks is 0 and reports averageRating: null', async () => {
+            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, maxBooks: 0 });
 
             const pushed = booksPushData.mock.calls[0][0] as unknown[];
             expect(pushed).toHaveLength(0);
@@ -133,8 +133,8 @@ describe('runNormal', () => {
             });
         });
 
-        it('caps at fixture length when maxItems exceeds it', async () => {
-            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, maxItems: 999 });
+        it('caps at fixture length when maxBooks exceeds it', async () => {
+            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, maxBooks: 999 });
 
             const pushed = booksPushData.mock.calls[0][0] as unknown[];
             expect(pushed).toHaveLength(3);

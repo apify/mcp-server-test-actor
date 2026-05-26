@@ -79,7 +79,7 @@ const COVER_PNG_BUFFER = Buffer.from(
     'base64',
 );
 
-export async function runNormal({ firstNumber, secondNumber, waitSeconds, maxItems }: Input): Promise<void> {
+export async function runNormal({ firstNumber, secondNumber, waitSeconds, maxBooks }: Input): Promise<void> {
     await Actor.setStatusMessage('Processing');
 
     if (waitSeconds > 0) {
@@ -93,7 +93,7 @@ export async function runNormal({ firstNumber, secondNumber, waitSeconds, maxIte
     const operations = computeOperations(firstNumber, secondNumber);
     await Actor.pushData({ firstNumber, secondNumber, sum, ...operations });
 
-    const books = APIFY_BOOK_FIXTURE.slice(0, maxItems);
+    const books = APIFY_BOOK_FIXTURE.slice(0, maxBooks);
     log.info('Pushing Apify book fixture', { count: books.length });
     const booksDataset = await Actor.openDataset({ alias: 'books' });
     await booksDataset.pushData(books);

@@ -18,9 +18,11 @@
 		"schemaVersion": 1,
 		"properties": {
 			"firstNumber": {
+				"sectionCaption": "Math (default dataset)",
+				"sectionDescription": "Two integers pushed to the default dataset along with derived nested math (fibonacci, factorials, primality).",
 				"title": "First number",
 				"type": "integer",
-				"description": "First addend. Bounded to keep derived math operations (factorial, fibonacci, primality) tractable.",
+				"description": "First addend. Bounded so derived math operations stay tractable.",
 				"default": 1,
 				"prefill": 1,
 				"minimum": 0,
@@ -29,26 +31,30 @@
 			"secondNumber": {
 				"title": "Second number",
 				"type": "integer",
-				"description": "Second addend. Bounded to keep derived math operations (factorial, fibonacci, primality) tractable.",
+				"description": "Second addend. Bounded so derived math operations stay tractable.",
 				"default": 2,
 				"prefill": 2,
 				"minimum": 0,
 				"maximum": 10
 			},
+			"maxBooks": {
+				"sectionCaption": "Books (books dataset)",
+				"sectionDescription": "Controls the fake book scraper that writes to the 'books' aliased dataset.",
+				"title": "Max books to scrape",
+				"type": "integer",
+				"editor": "number",
+				"description": "Maximum number of books to scrape. Defaults to all available books in the fixture.",
+				"minimum": 1
+			},
 			"waitSeconds": {
+				"sectionCaption": "Run behavior",
+				"sectionDescription": "Generic actor runtime settings.",
 				"title": "Wait seconds",
 				"type": "integer",
 				"description": "Number of seconds to wait before computing the sum.",
 				"default": 0,
 				"prefill": 0,
 				"minimum": 0
-			},
-			"maxItems": {
-				"title": "Max items",
-				"type": "integer",
-				"editor": "number",
-				"description": "Maximum number of books to scrape. Defaults to all available books.",
-				"minimum": 1
 			}
 		},
 		"required": ["firstNumber", "secondNumber"]
