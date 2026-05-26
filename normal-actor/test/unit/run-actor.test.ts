@@ -3,10 +3,15 @@ import { Actor } from 'apify';
 import { setTimeout } from 'node:timers/promises';
 import { runNormal } from '../../src/run-actor.js';
 
+const { booksPushData } = vi.hoisted(() => ({
+    booksPushData: vi.fn().mockResolvedValue(undefined),
+}));
+
 vi.mock('apify', () => ({
     Actor: {
         setStatusMessage: vi.fn().mockResolvedValue(undefined),
         pushData: vi.fn().mockResolvedValue(undefined),
+        openDataset: vi.fn().mockResolvedValue({ pushData: booksPushData }),
         setValue: vi.fn().mockResolvedValue(undefined),
         exit: vi.fn().mockResolvedValue(undefined),
     },
@@ -27,45 +32,48 @@ beforeEach(() => {
 });
 
 describe('runNormal', () => {
-    // Keeping this simple as it's not the main functionality of the actor
-    describe('sum computation', () => {
-        it('pushes the sum of two positive integers', async () => {
-            await runNormal({ firstNumber: 2, secondNumber: 3, waitSeconds: 0, includeBookFixture: false });
+    describe('sum dataset (default)', () => {
+        it('pushes the sum of two positive integers to the default dataset', async () => {
+            await runNormal({ firstNumber: 2, secondNumber: 3, waitSeconds: 0 });
             expect(Actor.pushData).toHaveBeenCalledExactlyOnceWith({
                 firstNumber: 2,
                 secondNumber: 3,
                 sum: 5,
             });
         });
-
-        it('does not write key-value records in default mode', async () => {
-            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, includeBookFixture: false });
-            expect(Actor.setValue).not.toHaveBeenCalled();
-        });
     });
 
-    describe('book fixture mode', () => {
-        it('pushes the book fixture instead of the sum item', async () => {
-            await runNormal({ firstNumber: 2, secondNumber: 3, waitSeconds: 0, includeBookFixture: true });
+    describe('books dataset (aliased)', () => {
+        it('opens the books dataset by alias and pushes the fixture', async () => {
+            await runNormal({ firstNumber: 2, secondNumber: 3, waitSeconds: 0 });
 
-            expect(Actor.pushData).toHaveBeenCalledExactlyOnceWith(expect.any(Array));
-            const pushed = vi.mocked(Actor.pushData).mock.calls[0][0] as Array<Record<string, unknown>>;
+            expect(Actor.openDataset).toHaveBeenCalledExactlyOnceWith({ alias: 'books' });
+            expect(booksPushData).toHaveBeenCalledExactlyOnceWith(expect.any(Array));
+
+            const pushed = booksPushData.mock.calls[0][0] as Array<Record<string, unknown>>;
             expect(pushed).toHaveLength(3);
-            // Verify the nested shape that the storage integration tests rely on.
+            // Verify the diverse-type shape that the storage integration tests rely on.
             expect(pushed[0]).toMatchObject({
                 title: expect.any(String),
-                author: { name: expect.any(String), country: expect.any(String) },
+                author: expect.any(String),
+                pages: expect.any(Number),
+                rating: expect.any(Number),
+                inStock: expect.any(Boolean),
+                tags: expect.any(Array),
                 publication: {
                     year: expect.any(Number),
                     publisher: { name: expect.any(String), city: expect.any(String) },
                 },
-                tags: expect.any(Array),
-                rating: expect.any(Number),
+                reviews: expect.arrayContaining([
+                    expect.objectContaining({ quote: expect.any(String), source: expect.any(String) }),
+                ]),
             });
         });
+    });
 
-        it('writes RESULT and STATS to the key-value store', async () => {
-            await runNormal({ firstNumber: 2, secondNumber: 3, waitSeconds: 0, includeBookFixture: true });
+    describe('key-value store records', () => {
+        it('writes RESULT and STATS on every run', async () => {
+            await runNormal({ firstNumber: 2, secondNumber: 3, waitSeconds: 0 });
 
             expect(Actor.setValue).toHaveBeenCalledWith('RESULT', { sum: 5 });
             expect(Actor.setValue).toHaveBeenCalledWith('STATS', expect.objectContaining({
@@ -76,70 +84,80 @@ describe('runNormal', () => {
         });
     });
 
+    describe('maxItems', () => {
+        it('slices the books fixture when maxItems is set', async () => {
+            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, maxItems: 2 });
+
+            const pushed = booksPushData.mock.calls[0][0] as unknown[];
+            expect(pushed).toHaveLength(2);
+            expect(Actor.setValue).toHaveBeenCalledWith('STATS', expect.objectContaining({ bookCount: 2 }));
+        });
+
+        it('pushes nothing when maxItems is 0 and reports averageRating: null', async () => {
+            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, maxItems: 0 });
+
+            const pushed = booksPushData.mock.calls[0][0] as unknown[];
+            expect(pushed).toHaveLength(0);
+            expect(Actor.setValue).toHaveBeenCalledWith('STATS', {
+                bookCount: 0,
+                totalRating: 0,
+                averageRating: null,
+            });
+        });
+
+        it('caps at fixture length when maxItems exceeds it', async () => {
+            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, maxItems: 999 });
+
+            const pushed = booksPushData.mock.calls[0][0] as unknown[];
+            expect(pushed).toHaveLength(3);
+        });
+    });
+
     describe('status and exit lifecycle', () => {
         it('sets the "Processing" status message before computing', async () => {
-            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, includeBookFixture: false });
+            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0 });
             expect(Actor.setStatusMessage).toHaveBeenCalledExactlyOnceWith('Processing');
         });
 
         it('calls exit with the success message at the end', async () => {
-            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, includeBookFixture: false });
+            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0 });
             expect(Actor.exit).toHaveBeenCalledExactlyOnceWith('Successfully completed');
         });
     });
 
     describe('delay behaviour', () => {
+        function trackCallOrder(): string[] {
+            const order: string[] = [];
+            const record = (label: string) => async () => {
+                order.push(label);
+                return undefined as never;
+            };
+            vi.mocked(Actor.setStatusMessage).mockImplementation(record('status'));
+            vi.mocked(setTimeout).mockImplementation(record('sleep'));
+            vi.mocked(Actor.pushData).mockImplementation(record('push'));
+            vi.mocked(Actor.exit).mockImplementation(record('exit'));
+            return order;
+        }
+
         it('does not sleep when delay is 0', async () => {
-            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, includeBookFixture: false });
+            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0 });
             expect(setTimeout).not.toHaveBeenCalled();
         });
 
         it('sleeps for waitSeconds when delay > 0', async () => {
-            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 5, includeBookFixture: false });
+            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 5 });
             expect(setTimeout).toHaveBeenCalledExactlyOnceWith(5000);
         });
 
         it('sleeps before pushing data', async () => {
-            const order: string[] = [];
-            vi.mocked(Actor.setStatusMessage).mockImplementation(async () => {
-                order.push('status');
-                return undefined as never;
-            });
-            vi.mocked(setTimeout).mockImplementation(async () => {
-                order.push('sleep');
-                return undefined as never;
-            });
-            vi.mocked(Actor.pushData).mockImplementation(async () => {
-                order.push('push');
-                return undefined as never;
-            });
-            vi.mocked(Actor.exit).mockImplementation(async () => {
-                order.push('exit');
-                return undefined as never;
-            });
-            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 2, includeBookFixture: false });
+            const order = trackCallOrder();
+            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 2 });
             expect(order).toEqual(['status', 'sleep', 'push', 'exit']);
         });
 
         it('skips the sleep step but keeps other order when delay=0', async () => {
-            const order: string[] = [];
-            vi.mocked(Actor.setStatusMessage).mockImplementation(async () => {
-                order.push('status');
-                return undefined as never;
-            });
-            vi.mocked(setTimeout).mockImplementation(async () => {
-                order.push('sleep');
-                return undefined as never;
-            });
-            vi.mocked(Actor.pushData).mockImplementation(async () => {
-                order.push('push');
-                return undefined as never;
-            });
-            vi.mocked(Actor.exit).mockImplementation(async () => {
-                order.push('exit');
-                return undefined as never;
-            });
-            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, includeBookFixture: false });
+            const order = trackCallOrder();
+            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0 });
             expect(order).toEqual(['status', 'push', 'exit']);
         });
     });

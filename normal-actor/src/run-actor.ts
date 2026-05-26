@@ -5,43 +5,65 @@ import { Actor, log } from 'apify';
 import type { Input } from './input-schema.js';
 
 /**
- * Fictional Apify book fixture used by MCP server integration tests. Each item has a 3-level nested
- * `publication.publisher.city` path used to verify that the storage tools recurse correctly through
- * dot-prefixed field selectors.
+ * Fictional Apify book fixture used by MCP server integration tests. Each field exercises a
+ * distinct JSON shape (string, integer, float, boolean, array of primitives, array of objects,
+ * 3-level nested object) so storage tools can be tested against varied paths and value types.
  */
 interface ApifyBook {
     title: string;
-    author: { name: string; country: string };
-    publication: { year: number; publisher: { name: string; city: string } };
-    tags: string[];
+    author: string;
+    pages: number;
     rating: number;
+    inStock: boolean;
+    tags: string[];
+    publication: { year: number; publisher: { name: string; city: string } };
+    reviews: { quote: string; source: string }[];
 }
 
 const APIFY_BOOK_FIXTURE: ApifyBook[] = [
     {
-        title: 'Async Patterns for Web Scrapers',
-        author: { name: 'Nadia Petrov', country: 'BG' },
-        publication: { year: 2025, publisher: { name: 'Apify Press', city: 'Prague' } },
-        tags: ['async', 'scraping', 'patterns'],
+        title: 'async/await and Other Lies I Told My Scraper',
+        author: 'Nadia "node_modules" Petrov',
+        pages: 1337,
         rating: 4.2,
+        inStock: true,
+        tags: ['async', 'scraping-noir', 'callback-hell'],
+        publication: { year: 2025, publisher: { name: 'Apify Press', city: 'Prague' } },
+        reviews: [
+            { quote: 'Better than the Node.js docs. Also longer.', source: 'JavaScript Weekly' },
+            { quote: 'Made me cry at the memory leak chapter.', source: 'Headless Times' },
+        ],
     },
     {
-        title: 'Headless Browsers in Practice',
-        author: { name: 'James Crawford', country: 'UK' },
+        title: 'PhantomJS Has Left the Building',
+        author: 'James Crawford',
+        pages: 423,
+        rating: 3.9,
+        inStock: false,
+        tags: ['headless', 'deprecated', 'last-render'],
         publication: { year: 2024, publisher: { name: 'Cheerio House', city: 'San Francisco' } },
-        tags: ['browser', 'automation'],
-        rating: 4.5,
+        reviews: [
+            { quote: 'Surprisingly, no robots.txt was violated in the making of this book.', source: 'Legal Weekly' },
+        ],
     },
     {
-        title: 'Resilient Scraping at Scale',
-        author: { name: 'Mira Botev', country: 'DE' },
-        publication: { year: 2025, publisher: { name: 'Event Loop Press', city: 'Berlin' } },
-        tags: ['scaling', 'reliability', 'apify'],
+        title: 'Wake. Code. Soylent. Repeat.',
+        author: 'Mira Botev',
+        pages: 210,
         rating: 4.7,
+        inStock: true,
+        tags: ['startup-grind', 'yc-noir', 'meal-replacement'],
+        publication: { year: 2025, publisher: { name: 'Event Loop Press', city: 'Prague' } },
+        reviews: [
+            {
+                quote: 'I asked my agent to summarize this book. It opened 4,000 tabs and ordered beer.',
+                source: 'Prompt Quarterly',
+            },
+        ],
     },
 ];
 
-export async function runNormal({ firstNumber, secondNumber, waitSeconds, includeBookFixture }: Input): Promise<void> {
+export async function runNormal({ firstNumber, secondNumber, waitSeconds, maxItems }: Input): Promise<void> {
     await Actor.setStatusMessage('Processing');
 
     if (waitSeconds > 0) {
@@ -52,24 +74,20 @@ export async function runNormal({ firstNumber, secondNumber, waitSeconds, includ
     const sum = firstNumber + secondNumber;
     log.info('Computed sum', { firstNumber, secondNumber, sum });
 
-    if (includeBookFixture) {
-        await runBookFixture(sum);
-    } else {
-        await Actor.pushData({ firstNumber, secondNumber, sum });
-    }
+    await Actor.pushData({ firstNumber, secondNumber, sum });
 
-    await Actor.exit('Successfully completed');
-}
+    const books = APIFY_BOOK_FIXTURE.slice(0, maxItems);
+    log.info('Pushing Apify book fixture', { count: books.length });
+    const booksDataset = await Actor.openDataset({ alias: 'books' });
+    await booksDataset.pushData(books);
 
-async function runBookFixture(sum: number): Promise<void> {
-    log.info('Pushing Apify book fixture', { count: APIFY_BOOK_FIXTURE.length });
-    await Actor.pushData(APIFY_BOOK_FIXTURE);
-
-    const totalRating = APIFY_BOOK_FIXTURE.reduce((acc, b) => acc + b.rating, 0);
+    const totalRating = books.reduce((acc, b) => acc + b.rating, 0);
     await Actor.setValue('RESULT', { sum });
     await Actor.setValue('STATS', {
-        bookCount: APIFY_BOOK_FIXTURE.length,
+        bookCount: books.length,
         totalRating,
-        averageRating: totalRating / APIFY_BOOK_FIXTURE.length,
+        averageRating: books.length === 0 ? null : totalRating / books.length,
     });
+
+    await Actor.exit('Successfully completed');
 }

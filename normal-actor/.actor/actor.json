@@ -3,7 +3,7 @@
 	"actorSpecification": 1,
 	"name": "normal-test-actor",
 	"title": "Apify normal test actor",
-	"description": "Actor used for MCP server testing. Runs only in normal actor mode: reads two integers from input, computes their sum, and pushes the result to the default dataset.",
+	"description": "Fake book scraper used for MCP server testing. Scrapes a built-in catalogue of fictional books (with varied JSON shapes) into the 'books' aliased dataset, and additionally computes the sum of two input integers into the default dataset and key-value store records (RESULT, STATS).",
 	"version": "0.0",
 	"buildTag": "latest",
 	"usesStandbyMode": false,
@@ -39,17 +39,22 @@
 				"prefill": 0,
 				"minimum": 0
 			},
-			"includeBookFixture": {
-				"title": "Include book fixture",
-				"type": "boolean",
-				"description": "If true, push the Apify book fixture (3 nested items) to the default dataset instead of the sum, and write RESULT + STATS records to the default key-value store.",
-				"default": false
+			"maxItems": {
+				"title": "Max items",
+				"type": "integer",
+				"editor": "number",
+				"description": "Maximum number of books to scrape. Defaults to all available books.",
+				"minimum": 1
 			}
 		},
 		"required": ["firstNumber", "secondNumber"]
 	},
+	"output": "./output_schema.json",
 	"storages": {
-		"dataset": "./dataset_schema.json",
+		"datasets": {
+			"default": "./default_dataset_schema.json",
+			"books": "./books_dataset_schema.json"
+		},
 		"keyValueStore": "./key_value_store_schema.json"
 	},
 	"dockerfile": "../Dockerfile"

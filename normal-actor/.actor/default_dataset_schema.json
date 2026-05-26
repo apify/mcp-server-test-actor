@@ -1,0 +1,30 @@
+{
+    "actorSpecification": 1,
+    "fields": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+            "firstNumber": { "type": "integer" },
+            "secondNumber": { "type": "integer" },
+            "sum": { "type": "integer" }
+        },
+        "required": ["firstNumber", "secondNumber", "sum"]
+    },
+    "views": {
+        "overview": {
+            "title": "Sum",
+            "description": "Single item with the two addends and the computed sum.",
+            "transformation": {
+                "fields": ["firstNumber", "secondNumber", "sum"]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "firstNumber": { "label": "First number", "format": "number" },
+                    "secondNumber": { "label": "Second number", "format": "number" },
+                    "sum": { "label": "Sum", "format": "number" }
+                }
+            }
+        }
+    }
+}

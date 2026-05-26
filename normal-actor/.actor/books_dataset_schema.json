@@ -5,12 +5,13 @@
         "type": "object",
         "properties": {
             "title": { "type": "string" },
-            "author": {
-                "type": "object",
-                "properties": {
-                    "name": { "type": "string" },
-                    "country": { "type": "string" }
-                }
+            "author": { "type": "string" },
+            "pages": { "type": "integer" },
+            "rating": { "type": "number" },
+            "inStock": { "type": "boolean" },
+            "tags": {
+                "type": "array",
+                "items": { "type": "string" }
             },
             "publication": {
                 "type": "object",
@@ -25,27 +26,36 @@
                     }
                 }
             },
-            "tags": {
+            "reviews": {
                 "type": "array",
-                "items": { "type": "string" }
-            },
-            "rating": { "type": "number" }
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "quote": { "type": "string" },
+                        "source": { "type": "string" }
+                    }
+                }
+            }
         }
     },
     "views": {
         "overview": {
             "title": "Overview",
-            "description": "All book fields, including nested publication and author details.",
+            "description": "All book fields. Each field uses a different JSON type to exercise storage tool paths.",
             "transformation": {
-                "fields": ["title", "author", "publication", "tags", "rating"],
-                "flatten": ["author", "publication"]
+                "fields": ["title", "author", "pages", "rating", "inStock", "tags", "publication", "reviews"],
+                "flatten": ["publication"]
             },
             "display": {
                 "component": "table",
                 "properties": {
                     "title": { "label": "Title", "format": "text" },
+                    "author": { "label": "Author", "format": "text" },
+                    "pages": { "label": "Pages", "format": "number" },
                     "rating": { "label": "Rating", "format": "number" },
-                    "tags": { "label": "Tags", "format": "array" }
+                    "inStock": { "label": "In stock", "format": "boolean" },
+                    "tags": { "label": "Tags", "format": "array" },
+                    "reviews": { "label": "Reviews", "format": "array" }
                 }
             }
         },
