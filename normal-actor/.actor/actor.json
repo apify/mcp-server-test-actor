@@ -3,7 +3,7 @@
 	"actorSpecification": 1,
 	"name": "normal-test-actor",
 	"title": "Apify normal test actor",
-	"description": "Fake book scraper used for MCP server testing. Scrapes a built-in catalogue of fictional books (with varied JSON shapes) into the 'books' aliased dataset, and additionally computes the sum of two input integers into the default dataset and key-value store records (RESULT, STATS).",
+	"description": "Fake book scraper used for MCP server testing. Scrapes a built-in catalogue of fictional books (with varied JSON shapes) into the 'books' aliased dataset, and additionally computes the sum of two input integers into the default dataset and key-value store records (RESULT, STATS, LOG, COVER).",
 	"version": "0.0",
 	"buildTag": "latest",
 	"usesStandbyMode": false,

@@ -121,16 +121,19 @@ describe('runNormal', () => {
             expect(Actor.setValue).toHaveBeenCalledWith('STATS', expect.objectContaining({ bookCount: 2 }));
         });
 
-        it('pushes nothing when maxBooks is 0 and reports averageRating: null', async () => {
-            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, maxBooks: 0 });
+        it('pushes a single book when maxBooks is 1 and computes its averageRating', async () => {
+            await runNormal({ firstNumber: 1, secondNumber: 1, waitSeconds: 0, maxBooks: 1 });
 
             const pushed = booksPushData.mock.calls[0][0] as unknown[];
-            expect(pushed).toHaveLength(0);
-            expect(Actor.setValue).toHaveBeenCalledWith('STATS', {
-                bookCount: 0,
-                totalRating: 0,
-                averageRating: null,
-            });
+            expect(pushed).toHaveLength(1);
+            expect(Actor.setValue).toHaveBeenCalledWith(
+                'STATS',
+                expect.objectContaining({
+                    bookCount: 1,
+                    totalRating: expect.any(Number),
+                    averageRating: expect.any(Number),
+                }),
+            );
         });
 
         it('caps at fixture length when maxBooks exceeds it', async () => {

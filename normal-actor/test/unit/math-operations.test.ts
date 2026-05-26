@@ -2,6 +2,10 @@ import { describe, it, expect } from 'vitest';
 
 import { computeOperations, factorial, fibonacci, isPrime } from '../../src/math-operations.js';
 
+// First 20 Fibonacci numbers (F(0)..F(19)), hardcoded so the upper-bound test
+// does not lean on the implementation it is meant to verify.
+const FIB_20 = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181];
+
 describe('factorial', () => {
     it('returns 1 for 0', () => expect(factorial(0)).toBe(1));
     it('returns n! across the valid input range (0–10)', () => {
@@ -53,7 +57,7 @@ describe('computeOperations', () => {
     it('computes factorial + fibonacci + primality at the upper bound (10 + 10)', () => {
         expect(computeOperations(10, 10)).toEqual({
             math: {
-                fibonacci: fibonacci(20),
+                fibonacci: FIB_20,
                 factorial: { first: 3628800, second: 3628800 },
             },
             isSumPrime: false,
