@@ -1,7 +1,7 @@
 {
     "actorKeyValueStoreSchemaVersion": 1,
     "title": "Normal test actor key-value store",
-    "description": "Records written by the actor. INPUT is auto-populated by Apify; RESULT and STATS are written on every run.",
+    "description": "Records written by the actor. INPUT is auto-populated by Apify; RESULT, STATS, LOG, and COVER are written on every run. Exercises multiple content types (JSON, text, binary) for storage tool testing.",
     "collections": {
         "input": {
             "title": "Input",
@@ -20,6 +20,18 @@
             "description": "Aggregate stats over the book fixture.",
             "key": "STATS",
             "contentTypes": ["application/json"]
+        },
+        "log": {
+            "title": "Log",
+            "description": "Plain-text log line. Exercises text/plain Content-Type preservation in get-key-value-store-record.",
+            "key": "LOG",
+            "contentTypes": ["text/plain"]
+        },
+        "cover": {
+            "title": "Cover image",
+            "description": "1x1 transparent PNG fixture. Exercises binary Content-Type preservation in get-key-value-store-record.",
+            "key": "COVER",
+            "contentTypes": ["image/png"]
         }
     }
 }

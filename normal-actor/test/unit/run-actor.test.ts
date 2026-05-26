@@ -67,6 +67,7 @@ describe('runNormal', () => {
                 pages: expect.any(Number),
                 rating: expect.any(Number),
                 inStock: expect.any(Boolean),
+                scrapedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T/),
                 tags: expect.any(Array),
                 publication: {
                     year: expect.any(Number),
@@ -75,12 +76,13 @@ describe('runNormal', () => {
                 reviews: expect.arrayContaining([
                     expect.objectContaining({ quote: expect.any(String), source: expect.any(String) }),
                 ]),
+                '#_internal': { sourceUrl: expect.any(String), runId: expect.any(String) },
             });
         });
     });
 
     describe('key-value store records', () => {
-        it('writes RESULT and STATS on every run', async () => {
+        it('writes RESULT and STATS as JSON on every run', async () => {
             await runNormal({ firstNumber: 2, secondNumber: 3, waitSeconds: 0 });
 
             expect(Actor.setValue).toHaveBeenCalledWith('RESULT', { sum: 5 });
@@ -89,6 +91,24 @@ describe('runNormal', () => {
                 totalRating: expect.any(Number),
                 averageRating: expect.any(Number),
             }));
+        });
+
+        it('writes LOG as text/plain', async () => {
+            await runNormal({ firstNumber: 2, secondNumber: 3, waitSeconds: 0 });
+
+            expect(Actor.setValue).toHaveBeenCalledWith(
+                'LOG',
+                expect.stringContaining('Scrape finished'),
+                { contentType: 'text/plain' },
+            );
+        });
+
+        it('writes COVER as a binary image/png buffer', async () => {
+            await runNormal({ firstNumber: 2, secondNumber: 3, waitSeconds: 0 });
+
+            expect(Actor.setValue).toHaveBeenCalledWith('COVER', expect.any(Buffer), {
+                contentType: 'image/png',
+            });
         });
     });
 

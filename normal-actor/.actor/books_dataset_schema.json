@@ -9,6 +9,7 @@
             "pages": { "type": "integer" },
             "rating": { "type": "number" },
             "inStock": { "type": "boolean" },
+            "scrapedAt": { "type": "string", "format": "date-time" },
             "tags": {
                 "type": "array",
                 "items": { "type": "string" }
@@ -35,6 +36,14 @@
                         "source": { "type": "string" }
                     }
                 }
+            },
+            "#_internal": {
+                "type": "object",
+                "description": "Hidden field (key starts with '#'). Stripped when items are fetched with clean=true / skipHidden=true.",
+                "properties": {
+                    "sourceUrl": { "type": "string", "format": "uri" },
+                    "runId": { "type": "string" }
+                }
             }
         }
     },
@@ -43,7 +52,7 @@
             "title": "Overview",
             "description": "All book fields. Each field uses a different JSON type to exercise storage tool paths.",
             "transformation": {
-                "fields": ["title", "author", "pages", "rating", "inStock", "tags", "publication", "reviews"],
+                "fields": ["title", "author", "pages", "rating", "inStock", "scrapedAt", "tags", "publication", "reviews"],
                 "flatten": ["publication"]
             },
             "display": {
@@ -54,6 +63,7 @@
                     "pages": { "label": "Pages", "format": "number" },
                     "rating": { "label": "Rating", "format": "number" },
                     "inStock": { "label": "In stock", "format": "boolean" },
+                    "scrapedAt": { "label": "Scraped at", "format": "date" },
                     "tags": { "label": "Tags", "format": "array" },
                     "reviews": { "label": "Reviews", "format": "array" }
                 }
