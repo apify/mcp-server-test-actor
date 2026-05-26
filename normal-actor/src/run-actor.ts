@@ -19,25 +19,25 @@ interface ApifyBook {
 
 const APIFY_BOOK_FIXTURE: ApifyBook[] = [
     {
-        title: 'async/await and Other Lies I Told My Scraper',
-        author: { name: 'Nadia "node_modules" Petrov', country: 'BG' },
+        title: 'Async Patterns for Web Scrapers',
+        author: { name: 'Nadia Petrov', country: 'BG' },
         publication: { year: 2025, publisher: { name: 'Apify Press', city: 'Prague' } },
-        tags: ['agentic', 'noir', 'callback-hell'],
+        tags: ['async', 'scraping', 'patterns'],
         rating: 4.2,
     },
     {
-        title: 'undefined is not a Function: A Love Story',
-        author: { name: 'Sir Crawls-a-Lot', country: 'UK' },
-        publication: { year: 2024, publisher: { name: 'Headless House', city: 'San Francisco' } },
-        tags: ['romance', 'typescript', 'tragedy'],
-        rating: 4.7,
+        title: 'Headless Browsers in Practice',
+        author: { name: 'James Crawford', country: 'UK' },
+        publication: { year: 2024, publisher: { name: 'Cheerio House', city: 'San Francisco' } },
+        tags: ['browser', 'automation'],
+        rating: 4.5,
     },
     {
-        title: 'It Works on My Machine — and Other Crime Scenes',
-        author: { name: 'BOT-7', country: 'CLOUD' },
-        publication: { year: 2025, publisher: { name: 'Event Loop Editions', city: 'Berlin' } },
-        tags: ['thriller', 'devops', 'rate-limited'],
-        rating: 4.9,
+        title: 'Resilient Scraping at Scale',
+        author: { name: 'Mira Botev', country: 'DE' },
+        publication: { year: 2025, publisher: { name: 'Event Loop Press', city: 'Berlin' } },
+        tags: ['scaling', 'reliability', 'apify'],
+        rating: 4.7,
     },
 ];
 
