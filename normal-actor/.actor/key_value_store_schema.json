@@ -1,0 +1,25 @@
+{
+    "actorKeyValueStoreSchemaVersion": 1,
+    "title": "Normal test actor key-value store",
+    "description": "Records written by the actor. INPUT is auto-populated by Apify; RESULT and STATS are written only when includeBookFixture=true.",
+    "collections": {
+        "input": {
+            "title": "Input",
+            "description": "Auto-populated by Apify with the run input.",
+            "key": "INPUT",
+            "contentTypes": ["application/json"]
+        },
+        "result": {
+            "title": "Result",
+            "description": "Computed sum, written when includeBookFixture=true.",
+            "key": "RESULT",
+            "contentTypes": ["application/json"]
+        },
+        "stats": {
+            "title": "Book fixture stats",
+            "description": "Aggregate stats over the book fixture, written when includeBookFixture=true.",
+            "key": "STATS",
+            "contentTypes": ["application/json"]
+        }
+    }
+}

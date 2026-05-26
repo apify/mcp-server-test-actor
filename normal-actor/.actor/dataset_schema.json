@@ -1,0 +1,64 @@
+{
+    "actorSpecification": 1,
+    "fields": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+            "title": { "type": "string" },
+            "author": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string" },
+                    "country": { "type": "string" }
+                }
+            },
+            "publication": {
+                "type": "object",
+                "properties": {
+                    "year": { "type": "integer" },
+                    "publisher": {
+                        "type": "object",
+                        "properties": {
+                            "name": { "type": "string" },
+                            "city": { "type": "string" }
+                        }
+                    }
+                }
+            },
+            "tags": {
+                "type": "array",
+                "items": { "type": "string" }
+            },
+            "rating": { "type": "number" }
+        }
+    },
+    "views": {
+        "overview": {
+            "title": "Overview",
+            "description": "All book fields, including nested publication and author details.",
+            "transformation": {
+                "fields": ["title", "author", "publication", "tags", "rating"],
+                "flatten": ["author", "publication"]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "title": { "label": "Title", "format": "text" },
+                    "rating": { "label": "Rating", "format": "number" },
+                    "tags": { "label": "Tags", "format": "array" }
+                }
+            }
+        },
+        "byPublisher": {
+            "title": "By publisher",
+            "description": "Compact view focused on publishing house and city.",
+            "transformation": {
+                "fields": ["title", "publication.publisher.name", "publication.publisher.city", "publication.year"],
+                "flatten": ["publication"]
+            },
+            "display": {
+                "component": "table"
+            }
+        }
+    }
+}
