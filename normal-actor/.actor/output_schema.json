@@ -6,7 +6,7 @@
         "books": {
             "type": "string",
             "title": "Books",
-            "description": "Scraped books (fake catalogue) with mixed JSON value types, used by the MCP server storage tool tests.",
+            "description": "Scraped books (fake catalogue) with mixed JSON value types and heterogeneous reviews[].",
             "template": "{{storages.datasets.books.apiUrl}}/items"
         },
         "math": {

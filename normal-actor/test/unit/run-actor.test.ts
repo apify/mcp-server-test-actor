@@ -81,6 +81,20 @@ describe('runNormal', () => {
         });
     });
 
+    describe('heterogeneous reviews across books', () => {
+        it('has reviews where rating and reviewer appear on only some entries', async () => {
+            await runNormal({ firstNumber: 2, secondNumber: 3, waitSeconds: 0 });
+
+            const books = booksPushData.mock.calls[0][0] as Array<{ reviews: Record<string, unknown>[] }>;
+            const allReviews = books.flatMap((b) => b.reviews);
+
+            expect(allReviews.some((r) => r.rating !== undefined)).toBe(true);
+            expect(allReviews.some((r) => r.rating === undefined)).toBe(true);
+            expect(allReviews.some((r) => r.reviewer !== undefined)).toBe(true);
+            expect(allReviews.some((r) => r.reviewer === undefined)).toBe(true);
+        });
+    });
+
     describe('key-value store records', () => {
         it('writes RESULT and STATS as JSON on every run', async () => {
             await runNormal({ firstNumber: 2, secondNumber: 3, waitSeconds: 0 });

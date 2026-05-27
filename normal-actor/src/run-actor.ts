@@ -6,11 +6,17 @@ import type { Input } from './input-schema.js';
 import { computeOperations } from './math-operations.js';
 
 /**
- * Fictional Apify book fixture used by MCP server integration tests. Each field exercises a
- * distinct JSON shape (string, ISO date, integer, float, boolean, array of primitives, array
- * of objects, 3-level nested object, hidden `#_internal` block) so storage tools can be tested
- * against varied paths, value types, and the `clean=true` hidden-field filter.
+ * Fictional Apify book fixture. `reviews[]` is intentionally heterogeneous (optional `rating`
+ * and `reviewer` appear on only some entries) so schema inference produces indexed paths like
+ * `reviews.0.rating`, `reviews.1.reviewer.name`.
  */
+interface Review {
+    quote: string;
+    source: string;
+    rating?: number;
+    reviewer?: { name: string };
+}
+
 interface ApifyBook {
     title: string;
     author: string;
@@ -20,7 +26,7 @@ interface ApifyBook {
     scrapedAt: string;
     tags: string[];
     publication: { year: number; publisher: { name: string; city: string } };
-    reviews: { quote: string; source: string }[];
+    reviews: Review[];
     '#_internal': { sourceUrl: string; runId: string };
 }
 
@@ -36,7 +42,7 @@ const APIFY_BOOK_FIXTURE: ApifyBook[] = [
         publication: { year: 2025, publisher: { name: 'Apify Press', city: 'Prague' } },
         reviews: [
             { quote: 'Better than the Node.js docs. Also longer.', source: 'JavaScript Weekly' },
-            { quote: 'Made me cry at the memory leak chapter.', source: 'Headless Times' },
+            { quote: 'Made me cry at the memory leak chapter.', source: 'Headless Times', rating: 5 },
         ],
         '#_internal': { sourceUrl: 'https://fakebooks.example.com/async-await', runId: 'fixture-run-001' },
     },
@@ -67,6 +73,7 @@ const APIFY_BOOK_FIXTURE: ApifyBook[] = [
             {
                 quote: 'I asked my agent to summarize this book. It opened 4,000 tabs and ordered beer.',
                 source: 'Prompt Quarterly',
+                reviewer: { name: 'crashcart' },
             },
         ],
         '#_internal': { sourceUrl: 'https://fakebooks.example.com/wake-code-soylent', runId: 'fixture-run-001' },

@@ -33,8 +33,14 @@
                     "type": "object",
                     "properties": {
                         "quote": { "type": "string" },
-                        "source": { "type": "string" }
-                    }
+                        "source": { "type": "string" },
+                        "rating": { "type": "integer" },
+                        "reviewer": {
+                            "type": "object",
+                            "properties": { "name": { "type": "string" } }
+                        }
+                    },
+                    "required": ["quote", "source"]
                 }
             },
             "#_internal": {
