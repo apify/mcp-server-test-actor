@@ -1,0 +1,25 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Fake book scraper output",
+    "description": "Scraped books in the 'books' aliased dataset, computed sum in the default dataset, and RESULT/STATS/LOG/COVER records in the default key-value store.",
+    "properties": {
+        "books": {
+            "type": "string",
+            "title": "Books",
+            "description": "Scraped books (fake catalogue) with mixed JSON value types and heterogeneous reviews[].",
+            "template": "{{storages.datasets.books.apiUrl}}/items"
+        },
+        "math": {
+            "type": "string",
+            "title": "Math",
+            "description": "Single dataset item with firstNumber, secondNumber, sum, and a nested math block (fibonacci, factorials, primality).",
+            "template": "{{storages.datasets.default.apiUrl}}/items"
+        },
+        "records": {
+            "type": "string",
+            "title": "Records",
+            "description": "Default key-value store records: INPUT (auto), RESULT (sum), STATS (scrape aggregates), LOG (text/plain), COVER (image/png).",
+            "template": "{{links.apiDefaultKeyValueStoreUrl}}/keys"
+        }
+    }
+}

@@ -3,7 +3,7 @@
 	"actorSpecification": 1,
 	"name": "normal-test-actor",
 	"title": "Apify normal test actor",
-	"description": "Actor used for MCP server testing. Runs only in normal actor mode: reads two integers from input, computes their sum, and pushes the result to the default dataset.",
+	"description": "Fake book scraper used for MCP server testing. Scrapes a built-in catalogue of fictional books (with varied JSON shapes) into the 'books' aliased dataset, and additionally computes the sum of two input integers into the default dataset and key-value store records (RESULT, STATS, LOG, COVER).",
 	"version": "0.0",
 	"buildTag": "latest",
 	"usesStandbyMode": false,
@@ -18,20 +18,37 @@
 		"schemaVersion": 1,
 		"properties": {
 			"firstNumber": {
+				"sectionCaption": "Math (default dataset)",
+				"sectionDescription": "Two integers pushed to the default dataset along with derived nested math (fibonacci, factorials, primality).",
 				"title": "First number",
 				"type": "integer",
-				"description": "First addend.",
+				"description": "First addend. Bounded so derived math operations stay tractable.",
 				"default": 1,
-				"prefill": 1
+				"prefill": 1,
+				"minimum": 0,
+				"maximum": 10
 			},
 			"secondNumber": {
 				"title": "Second number",
 				"type": "integer",
-				"description": "Second addend.",
+				"description": "Second addend. Bounded so derived math operations stay tractable.",
 				"default": 2,
-				"prefill": 2
+				"prefill": 2,
+				"minimum": 0,
+				"maximum": 10
+			},
+			"maxBooks": {
+				"sectionCaption": "Books (books dataset)",
+				"sectionDescription": "Controls the fake book scraper that writes to the 'books' aliased dataset.",
+				"title": "Max books to scrape",
+				"type": "integer",
+				"editor": "number",
+				"description": "Maximum number of books to scrape. Defaults to all available books in the fixture.",
+				"minimum": 1
 			},
 			"waitSeconds": {
+				"sectionCaption": "Run behavior",
+				"sectionDescription": "Generic actor runtime settings.",
 				"title": "Wait seconds",
 				"type": "integer",
 				"description": "Number of seconds to wait before computing the sum.",
@@ -41,6 +58,14 @@
 			}
 		},
 		"required": ["firstNumber", "secondNumber"]
+	},
+	"output": "./output_schema.json",
+	"storages": {
+		"datasets": {
+			"default": "./default_dataset_schema.json",
+			"books": "./books_dataset_schema.json"
+		},
+		"keyValueStore": "./key_value_store_schema.json"
 	},
 	"dockerfile": "../Dockerfile"
 }

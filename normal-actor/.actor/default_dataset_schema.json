@@ -1,0 +1,46 @@
+{
+    "actorSpecification": 1,
+    "fields": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+            "firstNumber": { "type": "integer" },
+            "secondNumber": { "type": "integer" },
+            "sum": { "type": "integer" },
+            "math": {
+                "type": "object",
+                "properties": {
+                    "fibonacci": { "type": "array", "items": { "type": "integer" } },
+                    "factorial": {
+                        "type": "object",
+                        "properties": {
+                            "first": { "type": ["integer", "null"] },
+                            "second": { "type": ["integer", "null"] }
+                        }
+                    }
+                }
+            },
+            "isSumPrime": { "type": "boolean" }
+        },
+        "required": ["firstNumber", "secondNumber", "sum"]
+    },
+    "views": {
+        "overview": {
+            "title": "Overview",
+            "description": "Two input integers, their sum, plus a nested math block (fibonacci sequence + factorials) and a primality flag.",
+            "transformation": {
+                "fields": ["firstNumber", "secondNumber", "sum", "math", "isSumPrime"]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "firstNumber": { "label": "First number", "format": "number" },
+                    "secondNumber": { "label": "Second number", "format": "number" },
+                    "sum": { "label": "Sum", "format": "number" },
+                    "math": { "label": "Math", "format": "object" },
+                    "isSumPrime": { "label": "Sum is prime", "format": "boolean" }
+                }
+            }
+        }
+    }
+}
